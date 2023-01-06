@@ -3,6 +3,7 @@ import Hash from '@ioc:Adonis/Core/Hash'
 import { column, beforeSave, BaseModel, hasMany, HasMany } from '@ioc:Adonis/Lucid/Orm'
 import LikedPartner from 'App/Models/LikedPartner'
 import Ulasan from 'App/Models/Ulasan'
+import Pengajuan from 'App/Models/Pengajuan'
 
 export default class User extends BaseModel {
   @column({ isPrimary: true })
@@ -34,6 +35,9 @@ export default class User extends BaseModel {
 
   @hasMany(() => Ulasan)
   public ulasans: HasMany<typeof Ulasan>
+
+  @hasMany(() => Pengajuan)
+  public pengajuans: HasMany<typeof Pengajuan>
 
   @beforeSave()
   public static async hashPassword (user: User) {
