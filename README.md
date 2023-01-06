@@ -1,7 +1,7 @@
 ![App Screenshot](https://res.cloudinary.com/adonisjs/image/upload/q_100/v1558612869/adonis-readme_zscycu.jpg)
 
 ## Cari Mitra API 📝  
-Cari Mitra is a provider as well as a partnership intermediary application between event creators and media partners. This API is built using the AdonisJS framework using the REST architecture.
+Cari Mitra is a partnership intermediary application between event organizer and media partners. This API is built using the AdonisJS framework and REST architecture.
 
 ## Features ✨
 - Multi-model Authentication (event organizer & partner)
@@ -12,4 +12,4 @@ Cari Mitra is a provider as well as a partnership intermediary application betwe
 - etc
     
 ## Disclaimer 🙂
-This API is still under development. Still, i keep improving this README as soon new feature is added.
+This API is still under development. Still, i keep improving this README as soon as new feature is added.
