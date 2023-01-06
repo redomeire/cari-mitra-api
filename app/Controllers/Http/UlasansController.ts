@@ -15,6 +15,8 @@ export default class UlasansController {
                 newUlasan.id_partner = body.id_partner;
                 newUlasan.deskripsi = body.deskripsi;
 
+                await newUlasan.save()
+
                 return response.status(200).json({ status: 'success', code: 200, data: newUlasan })
             } else throw new Error('cannot create ulasan')
 
@@ -23,13 +25,15 @@ export default class UlasansController {
         }
     }
 
-    public async getAll({ auth, response }: HttpContextContract){
+    public async getAll({ auth, request, response }: HttpContextContract){
+        const body = request.only(['partner_id']);
+
         try {
             const partner = auth.use('partner').user;
             if(partner === undefined)
                 return response.unauthorized('operation not permitted')
             
-            const foundUlasan = await Ulasan.all();
+            const foundUlasan = await Ulasan.query().where('id_partner', body.partner_id);
 
             return response.status(200).json({ status: 'success', code: 200, data: foundUlasan, message: 'ulasan berhasil didapatkan' })
         } catch (error) {
@@ -38,7 +42,7 @@ export default class UlasansController {
     }
 
     public async getById({ auth, request, response }: HttpContextContract){
-        const body = request.only(['id']);
+        const body = request.params();
 
         try {
             const user = auth.use('user').user;
@@ -52,7 +56,7 @@ export default class UlasansController {
 
                 return response.status(200).json({ status: 'success', code: 200, data: foundUlasan, message: 'ulasan berhasil didapatkan' })
         } catch (error) {
-            return response.status(500).json({ status: 'success', code: 500, message: error.message })
+            return response.status(500).json({ status: 'error', code: 500, message: error.message })
         }
     }
 
@@ -72,6 +76,8 @@ export default class UlasansController {
 
             foundUlasan.deskripsi = body.deskripsi;
             foundUlasan.nilai = body.nilai;
+
+            await foundUlasan.save()
 
             return response.status(200).json({ status: 'sucess', code: 200, data: foundUlasan })
 

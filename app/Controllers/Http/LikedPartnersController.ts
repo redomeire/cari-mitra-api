@@ -32,8 +32,8 @@ export default class LikedPartnersController {
         const body = request.only(['id']);
         
         try {
-            if(!await auth.use('user').check()) {
-                const foundLikedPartner = await LikedPartner.findBy('id_partner', body.id);
+            if(await auth.use('user').check()) {
+                const foundLikedPartner = await LikedPartner.findBy('id', body.id);
 
                 if(foundLikedPartner !== null) {
                     foundLikedPartner.disukai = !foundLikedPartner.disukai

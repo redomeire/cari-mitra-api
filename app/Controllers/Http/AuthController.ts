@@ -12,7 +12,9 @@ export default class AuthController {
 
             if (foundUser !== null) {
                 if ((await Hash.verify(foundUser.password, body.password))) {
-                    const token = await auth.use('user').generate(foundUser);
+                    const token = await auth.use('user').generate(foundUser, {
+                        expiresIn: "30 mins"
+                    });
                     return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
                 }
                 else {

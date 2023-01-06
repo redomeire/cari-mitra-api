@@ -80,7 +80,9 @@ export default class PartnersController {
                 throw new Error('partner not found')
 
             else if (await Hash.verify(foundPartner.password, body.password)) {
-                const token = await auth.use('partner').generate(foundPartner);
+                const token = await auth.use('partner').generate(foundPartner, {
+                    expiresIn: '30 mins'
+                });
                 return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
             }
         } catch (err) {

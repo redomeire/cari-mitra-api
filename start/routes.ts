@@ -51,7 +51,7 @@ Route.group(() => {
 
     Route.group(() => {
         Route.post('/create', 'UlasansController.create').middleware('auth')
-        Route.get('/get', 'UlasansController.getById').middleware('auth')
+        Route.get('/get/detail/:id', 'UlasansController.getById').middleware('auth')
         Route.get('/get/all', 'UlasansController.getAll').middleware('auth') // available for partner only
         Route.put('/update', 'UlasansController.update').middleware('auth')
         Route.delete('/delete', 'UlasansController.delete').middleware('auth')
