@@ -29,7 +29,7 @@ export default class AuthController {
         const body = request.only(['nama_depan', 'nama_belakang', 'email', 'password', 'remember_me_token']);
 
         try {
-            const isLoggedIn = await auth.check()
+            const isLoggedIn = await auth.use('user').check()
             const foundUser = await User.query().where('email', body.email).first()
 
             if (foundUser !== null)
@@ -81,7 +81,7 @@ export default class AuthController {
         const body = request.only(['id'])
         
         try{
-            if(!(await auth.check()))
+            if(!(await auth.use('user').check()))
                 return response.unauthorized('operation not permitted')
 
             const foundUser = await User.findBy('id', body.id);

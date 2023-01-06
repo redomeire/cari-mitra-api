@@ -26,17 +26,31 @@ Route.get('/', ({ response }) => {
 
 // user
 Route.group(() => {
-    Route.post('/register', 'AuthController.register');
-    Route.post('/login', 'AuthController.login');
-    Route.put('/password-reset', 'AuthController.reset').middleware('auth');
-    Route.delete('/delete', 'AuthController.delete').middleware('auth');
-}).prefix('/auth')
+    Route.group(() => {
+        Route.post('/register', 'AuthController.register');
+        Route.post('/login', 'AuthController.login');
+        Route.put('/password-reset', 'AuthController.reset').middleware('auth');
+        Route.delete('/delete', 'AuthController.delete').middleware('auth');
+    }).prefix('/auth')
+    
+    Route.group(() => {
+        Route.post('/create', 'PartnersController.create');
+        Route.post('/login', 'PartnersController.login');
+        Route.get('/get', 'PartnersController.index').middleware('auth');
+        Route.put('/edit', 'PartnersController.edit').middleware('auth');
+        Route.delete('/delete', 'PartnersController.delete').middleware('auth');
+        Route.post('/like', 'LikedPartnersController.create').middleware('auth')
+        Route.post('/toggle-like', 'LikedPartnersController.toggle').middleware('auth')
+    }).prefix('/partner')
 
-Route.group(() => {
-    Route.get('/get', 'PartnersController.index').middleware('auth');
-    Route.put('/edit', 'PartnersController.edit').middleware('auth');
-    Route.post('/create', 'PartnersController.create');
-    Route.post('/login', 'PartnersController.login');
-    Route.delete('/delete', 'PartnersController.delete').middleware('auth');
-}).prefix('/partner')
+    Route.group(() => {
+        Route.post('/create', 'UlasansController.create').middleware('auth')
+        Route.post('/get', 'UlasansController.getById').middleware('auth')
+        Route.post('/get/all', 'UlasansController.getAll').middleware('auth') // available for partner only
+        Route.post('/update', 'UlasansController.update').middleware('auth')
+        Route.post('/delete', 'UlasansController.delete').middleware('auth')
+    }).prefix('/ulasan')
+
+}).prefix('/api')
+    
 

@@ -27,4 +27,26 @@ export default class LikedPartnersController {
             return response.status(500).json({ status: 'error', code: 500, message: error.message })
         }
     }
+
+    public async toggle({ auth, request, response }: HttpContextContract){
+        const body = request.only(['id']);
+        
+        try {
+            if(!await auth.use('user').check()) {
+                const foundLikedPartner = await LikedPartner.findBy('id_partner', body.id);
+
+                if(foundLikedPartner !== null) {
+                    foundLikedPartner.disukai = !foundLikedPartner.disukai
+
+                    await foundLikedPartner.save();
+
+                    return response.status(200).json({ status: 'success', code: 200, data: foundLikedPartner, message: 'success toggle user' })
+                } else throw new Error('partner not found')
+            }
+            else return response.unauthorized('request not permitted')
+
+        } catch (error) {
+            return response.status(500).json({ status: 'error', code: 500, message: error.message })
+        }
+    }
 }
