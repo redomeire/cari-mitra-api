@@ -7,15 +7,12 @@ export default class AuthController {
     public async login({ auth, request, response }: HttpContextContract) {
         const body = request.only(['email', 'password']);
 
-        try {
-            if(!(await auth.check()))
-                return response.unauthorized('operation not permitted')
-                
+        try {                
             const foundUser = await User.query().where('email', body.email).first();
 
             if (foundUser !== null) {
                 if ((await Hash.verify(foundUser.password, body.password))) {
-                    const token = await auth.use('api').generate(foundUser);
+                    const token = await auth.use('user').generate(foundUser);
                     return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
                 }
                 else {
@@ -32,7 +29,7 @@ export default class AuthController {
         const body = request.only(['nama_depan', 'nama_belakang', 'email', 'password', 'remember_me_token']);
 
         try {
-            const isLoggedIn = await auth.check()
+            const isLoggedIn = await auth.use('user').check()
             const foundUser = await User.query().where('email', body.email).first()
 
             if (foundUser !== null)
@@ -62,7 +59,7 @@ export default class AuthController {
         const body = request.only(['old_password', 'new_password']);
 
         try {
-            const user = auth.use('api').user;
+            const user = auth.use('user').user;
 
             if (user !== undefined && await Hash.verify(user.password, body.old_password)) {
                 const foundUser = await User.query().where('email', user.email).first();
@@ -84,7 +81,7 @@ export default class AuthController {
         const body = request.only(['id'])
         
         try{
-            if(!(await auth.check()))
+            if(!(await auth.use('user').check()))
                 return response.unauthorized('operation not permitted')
 
             const foundUser = await User.findBy('id', body.id);

@@ -1,6 +1,8 @@
 import { DateTime } from 'luxon'
-import { BaseModel, beforeSave, column } from '@ioc:Adonis/Lucid/Orm'
+import { BaseModel, beforeSave, column, HasMany, hasMany } from '@ioc:Adonis/Lucid/Orm'
 import Hash from '@ioc:Adonis/Core/Hash'
+import LikedPartner from 'App/Models/LikedPartner'
+import Ulasan from 'App/Models/Ulasan'
 
 export default class Partner extends BaseModel {
   @column({ isPrimary: true })
@@ -40,6 +42,12 @@ export default class Partner extends BaseModel {
   public static async JSONify(partner: Partner){
       partner.dukungan = JSON.stringify(partner.dukungan)
   }
+
+  @hasMany(() => LikedPartner)
+  public likedpartners: HasMany<typeof LikedPartner>
+
+  @hasMany(() => Ulasan)
+  public ulasans: HasMany<typeof Ulasan>
 
   @beforeSave()
   public static async hashPassword(partner: Partner){

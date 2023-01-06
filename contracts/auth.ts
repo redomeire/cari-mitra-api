@@ -5,6 +5,7 @@
  * file.
  */
 
+import Partner from 'App/Models/Partner'
 import User from 'App/Models/User'
 
 declare module '@ioc:Adonis/Addons/Auth' {
@@ -36,6 +37,10 @@ declare module '@ioc:Adonis/Addons/Auth' {
     user: {
       implementation: LucidProviderContract<typeof User>
       config: LucidProviderConfig<typeof User>
+    },
+    partner: {
+      implementation: LucidProviderContract<typeof Partner>
+      config: LucidProviderConfig<typeof Partner>
     }
   }
 
@@ -64,10 +69,15 @@ declare module '@ioc:Adonis/Addons/Auth' {
     | to authenticate requests.
     |
     */
-    api: {
-      implementation: OATGuardContract<'user', 'api'>
+    user: {
+      implementation: OATGuardContract<'user', 'user'>
       config: OATGuardConfig<'user'>
       client: OATClientContract<'user'>
+    },
+    partner: {
+      implementation: OATGuardContract<'partner', 'partner'>
+      config: OATGuardConfig<'partner'>
+      client: OATClientContract<'partner'>
     }
   }
 }
