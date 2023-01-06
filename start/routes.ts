@@ -57,6 +57,13 @@ Route.group(() => {
         Route.delete('/delete', 'UlasansController.delete').middleware('auth')
     }).prefix('/ulasan')
 
+    Route.group(() => {
+        Route.post('/create', 'PengajuansController.create').middleware('auth') // for user
+        Route.post('/update', 'PengajuansController.update').middleware('auth') // for partner
+        Route.post('/user/find', 'PengajuansController.findUser').middleware('auth') // for user
+        Route.post('/partner/find', 'PengajuansController.findPartner').middleware('auth') // for user
+    }).prefix('/pengajuan')
+
 }).prefix('/api')
 
 
