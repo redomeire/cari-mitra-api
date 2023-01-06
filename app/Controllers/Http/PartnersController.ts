@@ -80,7 +80,9 @@ export default class PartnersController {
                 throw new Error('partner not found')
 
             else if (await Hash.verify(foundPartner.password, body.password)) {
-                const token = await auth.use('partner').generate(foundPartner);
+                const token = await auth.use('partner').generate(foundPartner, {
+                    expiresIn: '30 mins'
+                });
                 return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
             }
         } catch (err) {
@@ -102,6 +104,23 @@ export default class PartnersController {
             }
         } catch (err) {
             return response.status(500).json({ status: 'error', code: 500, message: err.message })
+        }
+    }
+
+    public async find({ auth, request, response }: HttpContextContract){
+        const body = request.qs();
+
+        try {
+            const user = auth.use('user').user;
+            if(user === undefined)
+                return response.unauthorized('operation not permitted')
+
+                const foundPartner = await Partner.query().where('nama', 'like', `%${body.q}%`);
+
+                return response.status(200).json({ status: 'success', code: 200, data: foundPartner, message: 'success get' })
+
+        } catch (error) {
+            return response.status(500).json({ status: 'error', code: 500, message: error.message })
         }
     }
 }

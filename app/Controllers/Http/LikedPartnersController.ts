@@ -32,8 +32,8 @@ export default class LikedPartnersController {
         const body = request.only(['id']);
         
         try {
-            if(!await auth.use('user').check()) {
-                const foundLikedPartner = await LikedPartner.findBy('id_partner', body.id);
+            if(await auth.use('user').check()) {
+                const foundLikedPartner = await LikedPartner.findBy('id', body.id);
 
                 if(foundLikedPartner !== null) {
                     foundLikedPartner.disukai = !foundLikedPartner.disukai
@@ -45,6 +45,21 @@ export default class LikedPartnersController {
             }
             else return response.unauthorized('request not permitted')
 
+        } catch (error) {
+            return response.status(500).json({ status: 'error', code: 500, message: error.message })
+        }
+    }
+
+    public async getAll({ auth, response }: HttpContextContract){
+        try {
+            const user = auth.use('user').user;
+
+            if(user === undefined)
+                return response.unauthorized('operation not permitted')
+
+                const allLikedPartners = await LikedPartner.all();
+
+                    return response.status(200).json({ status: 'success', code: 200, data: allLikedPartners, message: 'success getting favorites' })
         } catch (error) {
             return response.status(500).json({ status: 'error', code: 500, message: error.message })
         }

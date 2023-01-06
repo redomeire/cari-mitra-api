@@ -32,25 +32,38 @@ Route.group(() => {
         Route.put('/password-reset', 'AuthController.reset').middleware('auth');
         Route.delete('/delete', 'AuthController.delete').middleware('auth');
     }).prefix('/auth')
-    
+
     Route.group(() => {
         Route.post('/create', 'PartnersController.create');
         Route.post('/login', 'PartnersController.login');
-        Route.get('/get', 'PartnersController.index').middleware('auth');
+        Route.get('/get/all', 'PartnersController.index').middleware('auth');
+        Route.get('/search', 'PartnersController.find').middleware('auth');
         Route.put('/edit', 'PartnersController.edit').middleware('auth');
         Route.delete('/delete', 'PartnersController.delete').middleware('auth');
-        Route.post('/like', 'LikedPartnersController.create').middleware('auth')
-        Route.post('/toggle-like', 'LikedPartnersController.toggle').middleware('auth')
+
+        Route.group(() => {
+            Route.get('/get/all', 'LikedPartnersController.getAll').middleware('auth')
+            Route.post('/like', 'LikedPartnersController.create').middleware('auth')
+            Route.put('/toggle', 'LikedPartnersController.toggle').middleware('auth')
+        }).prefix('/favorite')
+
     }).prefix('/partner')
 
     Route.group(() => {
         Route.post('/create', 'UlasansController.create').middleware('auth')
-        Route.post('/get', 'UlasansController.getById').middleware('auth')
-        Route.post('/get/all', 'UlasansController.getAll').middleware('auth') // available for partner only
-        Route.post('/update', 'UlasansController.update').middleware('auth')
-        Route.post('/delete', 'UlasansController.delete').middleware('auth')
+        Route.get('/get/detail/:id', 'UlasansController.getById').middleware('auth')
+        Route.get('/get/all', 'UlasansController.getAll').middleware('auth') // available for partner only
+        Route.put('/update', 'UlasansController.update').middleware('auth')
+        Route.delete('/delete', 'UlasansController.delete').middleware('auth')
     }).prefix('/ulasan')
 
+    Route.group(() => {
+        Route.post('/create', 'PengajuansController.create').middleware('auth') // for user
+        Route.put('/update', 'PengajuansController.update').middleware('auth') // for partner
+        Route.get('/user/find/:id', 'PengajuansController.userFind').middleware('auth') // for user
+        Route.get('/partner/find/:id', 'PengajuansController.partnerFind').middleware('auth') // for user
+    }).prefix('/pengajuan')
+
 }).prefix('/api')
-    
+
 
