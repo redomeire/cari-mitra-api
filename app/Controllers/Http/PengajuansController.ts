@@ -16,7 +16,7 @@ export default class PengajuansController {
                 newPengajuan.jenis_acara = body.jenis_acara
                 newPengajuan.tanggal = body.tanggal
                 newPengajuan.waktu = body.waktu
-                // newPengajuan.status = body.status
+                newPengajuan.status = body.status
                 newPengajuan.id_user = user.id
                 newPengajuan.id_partner = body.id_partner
                 newPengajuan.deskripsi_acara = body.deskripsi_acara
@@ -41,7 +41,7 @@ export default class PengajuansController {
             if(partner === undefined)
                 return response.unauthorized('only partner has the authority')
 
-            const foundPengajuan = await Pengajuan.query().where('id', body.id).first();
+            const foundPengajuan = await Pengajuan.query().where('id', body.id).where('id_partner', partner.id).first();
 
             if(foundPengajuan === null)
                 return response.notFound(`cannot find pengajuan with id ${body.id}`)
@@ -56,7 +56,7 @@ export default class PengajuansController {
     }
 
     public async userFind({ auth, request, response }: HttpContextContract){
-        const body = request.only(['id'])
+        const body = request.params()
 
         try {
             const user = auth.use('user').user;
@@ -64,7 +64,7 @@ export default class PengajuansController {
             if(user === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'operation not permitted' })
 
-                const foundPengajuan = await Pengajuan.findBy('id', body.id);
+                const foundPengajuan = await Pengajuan.query().where('id', body.id).where('id_user', user.id).first();
 
                 return response.ok({ status: 'success', code: 200, data: foundPengajuan })
         } catch (error) {
@@ -73,7 +73,7 @@ export default class PengajuansController {
     }
 
     public async partnerFind({ auth, request, response }: HttpContextContract){
-        const body = request.only(['id'])
+        const body = request.params()
 
         try {
             const partner = auth.use('partner').user;
@@ -81,7 +81,7 @@ export default class PengajuansController {
             if(partner === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'operation not permitted' })
 
-                const foundPengajuan = await Pengajuan.findBy('id', body.id);
+                const foundPengajuan = await Pengajuan.query().where('id', body.id).where('id_partner', partner.id).first();
 
                 return response.ok({ status: 'success', code: 200, data: foundPengajuan })
         } catch (error) {
