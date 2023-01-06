@@ -81,7 +81,7 @@ export default class PartnersController {
 
             else if (await Hash.verify(foundPartner.password, body.password)) {
                 const token = await auth.use('partner').generate(foundPartner, {
-                    expiresIn: '30 mins'
+                    expiresIn: '60 mins'
                 });
                 return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
             }
