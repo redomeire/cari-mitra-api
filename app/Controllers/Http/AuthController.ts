@@ -7,10 +7,7 @@ export default class AuthController {
     public async login({ auth, request, response }: HttpContextContract) {
         const body = request.only(['email', 'password']);
 
-        try {
-            if(!(await auth.check()))
-                return response.unauthorized('operation not permitted')
-                
+        try {                
             const foundUser = await User.query().where('email', body.email).first();
 
             if (foundUser !== null) {
