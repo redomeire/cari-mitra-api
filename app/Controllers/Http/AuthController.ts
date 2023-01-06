@@ -15,7 +15,7 @@ export default class AuthController {
 
             if (foundUser !== null) {
                 if ((await Hash.verify(foundUser.password, body.password))) {
-                    const token = await auth.use('api').generate(foundUser);
+                    const token = await auth.use('user').generate(foundUser);
                     return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
                 }
                 else {
@@ -62,7 +62,7 @@ export default class AuthController {
         const body = request.only(['old_password', 'new_password']);
 
         try {
-            const user = auth.use('api').user;
+            const user = auth.use('user').user;
 
             if (user !== undefined && await Hash.verify(user.password, body.old_password)) {
                 const foundUser = await User.query().where('email', user.email).first();

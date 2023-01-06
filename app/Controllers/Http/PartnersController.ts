@@ -4,8 +4,18 @@ import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class PartnersController {
 
-    public async index({ response }: HttpContextContract) {
-        return response.json({ data: await Partner.all() })
+    public async index({ auth, response }: HttpContextContract) {
+        try {
+            if(await auth.use('partner').check()) {
+                return response.status(200).json({ data: await Partner.all() })
+            }
+
+            else 
+                return response.status(401).json({ message: 'unauthorized operation' })
+        } catch(err){
+            return response.status(401).json({ status: 'error', code: 401, message: err.message })
+        }
+
     }
 
     public async edit({ request, response }: HttpContextContract) {
@@ -70,19 +80,20 @@ export default class PartnersController {
                 throw new Error('partner not found')
 
             else if (await Hash.verify(foundPartner.password, body.password)) {
-                // const token = await auth.use('api').generate(foundPartner);
-                // return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
+                const token = await auth.use('partner').generate(foundPartner);
+                return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
             }
         } catch (err) {
-
+            return response.status(500).json({ status: 'error', code: 500, message: err.message })
         }
     }
 
-    public async delete({ request, response }: HttpContextContract) {
+    public async delete({ auth, request, response }: HttpContextContract) {
         const body = request.only(['id'])
 
         try {
             const foundPartner = await Partner.findBy('id', body.id);
+            await auth.use('partner').check()
 
             if (foundPartner === null)
                 throw new Error('Partner not found')

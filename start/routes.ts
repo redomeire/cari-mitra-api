@@ -33,9 +33,9 @@ Route.group(() => {
 }).prefix('/auth')
 
 Route.group(() => {
-    Route.get('/get', 'PartnersController.index');
+    Route.get('/get', 'PartnersController.index').middleware('auth');
     Route.put('/edit', 'PartnersController.edit');
-    Route.post('/create', 'PartnersController.create');
+    Route.post('/create', 'PartnersController.create').middleware('auth');
     Route.post('/login', 'PartnersController.login');
     Route.delete('/delete', 'PartnersController.delete');
 }).prefix('/partner')
