@@ -10,20 +10,17 @@ export default class AuthController {
         try {                
             const foundUser = await User.query().where('email', body.email).first();
 
-            if (foundUser !== null) {
-                if ((await Hash.verify(foundUser.password, body.password))) {
-                    const token = await auth.use('user').generate(foundUser, {
-                        expiresIn: "60 mins"
-                    });
-                    return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
-                }
-                else {
-                    const error = new Error('invalid credential')
-                    throw error
-                }
-            }
+            if (foundUser === null) 
+                return response.notFound({ status: 'error', code: 404, message: 'user not found' })
+
+            if (!(await Hash.verify(foundUser.password, body.password))) 
+                return response.forbidden({ status: 'error', code: 403, message: 'email or password wrong' });
+
+            const token = await auth.use('user').generate(foundUser); // add expiration in next update
+
+            return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON(), ...foundUser.toJSON(), role: 'user' } })
         } catch (err) {
-            return response.status(404).json({ status: 'error', code: 404, data: { message: err.message } })
+            return response.status(500).json({ status: 'error', code: 500, data: { message: err.message } })
         }
     }
 
@@ -79,6 +76,33 @@ export default class AuthController {
         }
     }
 
+    public async update({ auth, request, response }: HttpContextContract){
+        const body = request.all();
+
+        try {
+            const user = auth.use('user').user;
+
+            if(user === undefined)
+                return response.unauthorized({ message: 'operation not permitted' })
+
+                const foundUser = await User.findBy('id', user.id);
+
+                if(foundUser === null)
+                    return response.notFound({ message: 'user not found' })
+
+                    foundUser.nama_depan = body.nama_depan;
+                    foundUser.nama_belakang = body.nama_belakang;
+                    foundUser.email = body.email;
+
+                    await foundUser.save();
+
+                    return response.ok({ status: 'success', code: 200, data: foundUser, message: 'success update profile' })
+                
+        } catch (error) {
+            return response.badRequest({ message: 'error processing request' })
+        }
+    }
+
     public async delete({ auth, request, response }: HttpContextContract) {
         const body = request.only(['id'])
         
@@ -96,6 +120,21 @@ export default class AuthController {
 
         } catch(err) {
             return response.status(404).json({ status: 'error', code: 404, data: { message: err.message } })
+        }
+    }
+
+    public async logout({ auth, response }: HttpContextContract){
+        try {
+            const user = auth.use('user').user;
+
+            if(user === undefined)
+                return response.unauthorized({ status: 'error', code: 401, message: 'request unauthorized' })
+
+            await auth.use('user').revoke()
+
+            return response.ok({ status: 'success', code: 200, message: 'token revoked' })
+        } catch (error) {
+            return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
     }
 }

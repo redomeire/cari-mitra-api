@@ -83,10 +83,40 @@ export default class PartnersController {
                 const token = await auth.use('partner').generate(foundPartner, {
                     expiresIn: '60 mins'
                 });
-                return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON() } })
+                return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON(), ...foundPartner.toJSON(), role: 'partner' } })
             }
         } catch (err) {
             return response.status(500).json({ status: 'error', code: 500, message: err.message })
+        }
+    }
+
+    public async update({ auth, request, response }: HttpContextContract){
+        const body = request.all();
+
+        try {
+            const partner = auth.use('partner').user;
+
+            if(partner === undefined)
+                return response.unauthorized({ message: 'operation not permitted' })
+
+                const foundPartner = await Partner.findBy('id', body.id);
+
+                if(foundPartner === null)
+                    return response.notFound({ message: 'partner not found' })
+
+                    foundPartner.email = body.email;
+                    partner.nama = body.nama;
+                    partner.sop = body.sop;
+                    partner.dukungan = body.dukungan;
+                    partner.no_telp = body.no_telp;
+                    partner.deskripsi = body.deskripsi;
+                    partner.alamat = body.alamat;
+                    
+                    await foundPartner.save();
+
+                    return response.ok({ status: 'success', code: 200, data: foundPartner })
+        } catch (error) {
+            return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
     }
 
@@ -121,6 +151,21 @@ export default class PartnersController {
 
         } catch (error) {
             return response.status(500).json({ status: 'error', code: 500, message: error.message })
+        }
+    }
+
+    public async logout({ auth, response }: HttpContextContract){
+        try {
+            const partner = auth.use('partner').user;
+
+            if(partner === undefined)
+                return response.unauthorized({ status: 'error', code: 401, message: 'request unauthorized' })
+
+            await auth.use('partner').revoke()
+
+            return response.ok({ status: 'success', code: 200, message: 'partner token revoked' })
+        } catch (error) {
+            return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
     }
 }
