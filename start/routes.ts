@@ -31,6 +31,7 @@ Route.group(() => {
         Route.post('/login', 'AuthController.login');
         Route.put('/password-reset', 'AuthController.reset').middleware('auth');
         Route.delete('/delete', 'AuthController.delete').middleware('auth');
+        Route.post('/logout', 'AuthController.logout').middleware('auth');
     }).prefix('/auth')
 
     Route.group(() => {
@@ -40,6 +41,7 @@ Route.group(() => {
         Route.get('/search', 'PartnersController.find').middleware('auth');
         Route.put('/edit', 'PartnersController.edit').middleware('auth');
         Route.delete('/delete', 'PartnersController.delete').middleware('auth');
+        Route.post('/logout', 'PartnersController.logout').middleware('auth');
 
         Route.group(() => {
             Route.get('/get/all', 'LikedPartnersController.getAll').middleware('auth')
