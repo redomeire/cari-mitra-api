@@ -1,18 +1,17 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Partner from 'App/Models/Partner'
-import Hash from '@ioc:Adonis/Core/Hash'
 
 export default class PartnersController {
 
     public async index({ auth, response }: HttpContextContract) {
         try {
-            if(await auth.use('partner').check()) {
+            if (await auth.use('partner').check()) {
                 return response.status(200).json({ data: await Partner.all() })
             }
 
-            else 
+            else
                 return response.status(401).json({ message: 'unauthorized operation' })
-        } catch(err){
+        } catch (err) {
             return response.status(401).json({ status: 'error', code: 401, message: err.message })
         }
 
@@ -47,7 +46,7 @@ export default class PartnersController {
         const body = request.all()
 
         try {
-            const foundPartner = await Partner.query().where('email', body.email);
+            const foundPartner = await Partner.query().where('email', body.email).first();
 
             if (foundPartner !== null)
                 return response.status(500).json({ status: 'error', code: 500, message: `partner with email ${body.email} already been created` })
@@ -74,47 +73,39 @@ export default class PartnersController {
         const body = request.only(['email', 'password']);
 
         try {
-            const foundPartner = await Partner.findBy('email', body.email);
+            const token = await auth.use('partner').attempt(body.email, body.password)
 
-            if (foundPartner === null)
-                throw new Error('partner not found')
-
-            else if (await Hash.verify(foundPartner.password, body.password)) {
-                const token = await auth.use('partner').generate(foundPartner, {
-                    expiresIn: '60 mins'
-                });
-                return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON(), ...foundPartner.toJSON(), role: 'partner' } })
-            }
+            return response.status(200).json({ status: 'success', code: 200, data: { ...token.toJSON(), ...auth.use('partner').user?.toJSON(), role: 'partner' } })
         } catch (err) {
             return response.status(500).json({ status: 'error', code: 500, message: err.message })
         }
     }
 
-    public async update({ auth, request, response }: HttpContextContract){
+    public async update({ auth, request, response }: HttpContextContract) {
         const body = request.all();
 
         try {
             const partner = auth.use('partner').user;
 
-            if(partner === undefined)
+            if (partner === undefined)
                 return response.unauthorized({ message: 'operation not permitted' })
 
-                const foundPartner = await Partner.findBy('id', body.id);
+            const foundPartner = await Partner.findBy('id', body.id);
 
-                if(foundPartner === null)
-                    return response.notFound({ message: 'partner not found' })
+            if (foundPartner === null)
+                return response.notFound({ message: 'partner not found' })
 
-                    foundPartner.email = body.email;
-                    partner.nama = body.nama;
-                    partner.sop = body.sop;
-                    partner.dukungan = body.dukungan;
-                    partner.no_telp = body.no_telp;
-                    partner.deskripsi = body.deskripsi;
-                    partner.alamat = body.alamat;
-                    
-                    await foundPartner.save();
+            foundPartner.email = body.email;
+            partner.nama = body.nama;
+            partner.sop = body.sop;
+            partner.dukungan = body.dukungan;
+            partner.no_telp = body.no_telp;
+            partner.deskripsi = body.deskripsi;
+            partner.alamat = body.alamat;
 
-                    return response.ok({ status: 'success', code: 200, data: foundPartner })
+            await foundPartner.save();
+
+            return response.ok({ status: 'success', code: 200, data: foundPartner })
         } catch (error) {
             return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
@@ -137,28 +128,28 @@ export default class PartnersController {
         }
     }
 
-    public async find({ auth, request, response }: HttpContextContract){
+    public async find({ auth, request, response }: HttpContextContract) {
         const body = request.qs();
 
         try {
             const user = auth.use('user').user;
-            if(user === undefined)
+            if (user === undefined)
                 return response.unauthorized('operation not permitted')
 
-                const foundPartner = await Partner.query().where('nama', 'like', `%${body.q}%`);
+            const foundPartner = await Partner.query().where('nama', 'like', `%${body.q}%`);
 
-                return response.status(200).json({ status: 'success', code: 200, data: foundPartner, message: 'success get' })
+            return response.status(200).json({ status: 'success', code: 200, data: foundPartner, message: 'success get' })
 
         } catch (error) {
             return response.status(500).json({ status: 'error', code: 500, message: error.message })
         }
     }
 
-    public async logout({ auth, response }: HttpContextContract){
+    public async logout({ auth, response }: HttpContextContract) {
         try {
             const partner = auth.use('partner').user;
 
-            if(partner === undefined)
+            if (partner === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'request unauthorized' })
 
             await auth.use('partner').revoke()
