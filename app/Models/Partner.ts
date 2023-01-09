@@ -33,6 +33,9 @@ export default class Partner extends BaseModel {
   @column()
   public alamat: string
 
+  @column()
+  public image_url: string
+
   @column.dateTime({ autoCreate: true })
   public createdAt: DateTime
 
