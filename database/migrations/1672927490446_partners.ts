@@ -14,6 +14,7 @@ export default class extends BaseSchema {
       table.string('no_telp').nullable()
       table.string('deskripsi').nullable()
       table.string('alamat').nullable()
+      table.string('image_url').nullable()
       /**
        * Uses timestamptz for PostgreSQL and DATETIME2 for MSSQL
        */

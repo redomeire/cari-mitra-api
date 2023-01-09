@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Partner from 'App/Models/Partner'
+import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
 
 export default class PartnersController {
 
@@ -44,12 +45,21 @@ export default class PartnersController {
 
     public async create({ request, response }: HttpContextContract) {
         const body = request.all()
+        const file = request.file('file', {
+            size: '500kb',
+            extnames: ['jpg', 'jpeg', 'png']
+        })
 
         try {
             const foundPartner = await Partner.query().where('email', body.email).first();
 
             if (foundPartner !== null)
                 return response.status(500).json({ status: 'error', code: 500, message: `partner with email ${body.email} already been created` })
+
+            if (!file?.isValid)
+                return response.internalServerError({ status: 'error', code: 500, message: file?.errors })
+
+            const image = await cloudinary.upload(file, file.clientName)
 
             const newPartner = new Partner();
 
@@ -60,6 +70,7 @@ export default class PartnersController {
             newPartner.dukungan = body.dukungan;
             newPartner.no_telp = body.no_telp;
             newPartner.alamat = body.alamat;
+            newPartner.image_url = image.url;
 
             await newPartner.save();
 
@@ -110,7 +121,7 @@ export default class PartnersController {
             return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
     }
-
+    
     public async delete({ auth, request, response }: HttpContextContract) {
         const body = request.only(['id'])
 
