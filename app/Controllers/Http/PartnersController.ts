@@ -71,6 +71,7 @@ export default class PartnersController {
             newPartner.no_telp = body.no_telp;
             newPartner.alamat = body.alamat;
             newPartner.image_url = image.url;
+            newPartner.deskripsi = body.deskripsi;
 
             await newPartner.save();
 
@@ -136,6 +137,26 @@ export default class PartnersController {
             }
         } catch (err) {
             return response.status(500).json({ status: 'error', code: 500, message: err.message })
+        }
+    }
+
+    public async getById({ auth, request, response }: HttpContextContract){
+        const params = request.params();
+        
+        try {
+            const user = auth.use('user').user;
+
+            if(user === undefined)
+                return response.unauthorized({ status: 'error', code: 401, message: 'unauthorized operation' })
+
+            const foundPartner = await Partner.findBy('id', params.id);
+
+            if(foundPartner === null)
+                return response.notFound({ status: 'error', code: 404, message: 'partner not found' })
+
+                return response.ok({ status: 'success', code: 200, data: foundPartner })
+        } catch (error) {
+            return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
     }
 

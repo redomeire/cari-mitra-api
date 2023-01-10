@@ -38,7 +38,7 @@ Route.group(() => {
         Route.post('/create', 'PartnersController.create');
         Route.post('/login', 'PartnersController.login');
         Route.get('/get/all', 'PartnersController.index').middleware('auth');
-        Route.get('/get/:id', 'PartnersController.getByid').middleware('auth');
+        Route.get('/get/:id', 'PartnersController.getById').middleware('auth');
         Route.get('/search', 'PartnersController.find').middleware('auth');
         Route.put('/edit', 'PartnersController.edit').middleware('auth');
         Route.delete('/delete', 'PartnersController.delete').middleware('auth');

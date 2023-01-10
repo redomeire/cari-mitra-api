@@ -12,7 +12,7 @@ export default class extends BaseSchema {
       table.string('sop').nullable()
       table.json('dukungan').nullable()
       table.string('no_telp').nullable()
-      table.string('deskripsi').nullable()
+      table.text('deskripsi').nullable()
       table.string('alamat').nullable()
       table.string('image_url').nullable()
       /**
