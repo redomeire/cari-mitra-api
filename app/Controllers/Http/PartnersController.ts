@@ -1,6 +1,7 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Partner from 'App/Models/Partner'
 import cloudinary from '@ioc:Adonis/Addons/Cloudinary'
+import Database from '@ioc:Adonis/Lucid/Database'
 
 export default class PartnersController {
 
@@ -168,9 +169,19 @@ export default class PartnersController {
             if (user === undefined)
                 return response.unauthorized('operation not permitted')
 
-            const foundPartner = await Partner.query().where('nama', 'like', `%${body.q}%`);
+            // const foundPartner = await Partner.query().where('nama', 'like', `%${body.q}%`);
 
-            return response.status(200).json({ status: 'success', code: 200, data: foundPartner, message: 'success get' })
+            const foundLike = await Database
+            .from('partners')
+            .leftJoin('liked_partners', 'partners.id', '=', 'liked_partners.id_partner')
+            .select('partners.id')
+            .select('partners.nama')
+            .select('partners.deskripsi')
+            .select('partners.image_url')
+            .select('liked_partners.disukai')
+            .where('partners.nama', 'like', `%${body.q}%`)
+
+            return response.status(200).json({ status: 'success', code: 200, data: foundLike, message: 'success get' })
 
         } catch (error) {
             return response.status(500).json({ status: 'error', code: 500, message: error.message })
