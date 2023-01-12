@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database';
 import Pengajuan from 'App/Models/Pengajuan';
 
 export default class PengajuansController {
@@ -16,7 +17,7 @@ export default class PengajuansController {
                 newPengajuan.jenis_acara = body.jenis_acara
                 newPengajuan.tanggal = body.tanggal
                 newPengajuan.waktu = body.waktu
-                newPengajuan.status = body.status
+                newPengajuan.status = ["berlangsung"]
                 newPengajuan.id_user = user.id
                 newPengajuan.id_partner = body.id_partner
                 newPengajuan.deskripsi_acara = body.deskripsi_acara
@@ -86,6 +87,31 @@ export default class PengajuansController {
                 return response.ok({ status: 'success', code: 200, data: foundPengajuan })
         } catch (error) {
                 return response.internalServerError({ status: 'error', code: 500, message: error.message })
+        }
+    }
+
+    public async getAllPengajuan({ auth, response }: HttpContextContract){
+        try {
+            const user = auth.use('user').user;
+
+            if(user === undefined)
+                return response.unauthorized({ status: 'error', code: 401, message: 'operation not permitted' })
+
+                const foundPengajuans = await Database
+                .from('pengajuans')
+                .join('partners', 'partners.id', '=', 'pengajuans.id_partner')
+                .join('users', 'users.id', '=', 'pengajuans.id_user')
+                .where('pengajuans.id_user', user.id)
+                .select('pengajuans.id')
+                .select('partners.nama')
+                .select('partners.image_url')
+                .select('pengajuans.created_at')
+                .select('pengajuans.status')
+                .select('pengajuans.nama_acara')
+
+                return response.ok({ status: 'ok', code: 200, data: foundPengajuans })
+        } catch (error) {
+            return response.internalServerError({ status: 'error', code: 500, data: error.message })
         }
     }
 

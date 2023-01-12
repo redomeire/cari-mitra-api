@@ -67,6 +67,8 @@ export default class LikedPartnersController {
                 .select('partners.deskripsi')
                 .select('partners.alamat')
                 .select('partners.no_telp')
+                .select('partners.image_url')
+                .select('liked_partners.created_at')
 
                     return response.status(200).json({ status: 'success', code: 200, data: allLikedPartners, message: 'success getting favorites' })
         } catch (error) {

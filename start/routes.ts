@@ -64,6 +64,7 @@ Route.group(() => {
         Route.post('/create', 'PengajuansController.create').middleware('auth') // for user
         Route.put('/update', 'PengajuansController.update').middleware('auth') // for partner
         Route.get('/user/find/:id', 'PengajuansController.userFind').middleware('auth') // for user
+        Route.get('/user/get/all', 'PengajuansController.getAllPengajuan').middleware('auth') // for user
         Route.get('/partner/find/:id', 'PengajuansController.partnerFind').middleware('auth') // for user
     }).prefix('/pengajuan')
 
