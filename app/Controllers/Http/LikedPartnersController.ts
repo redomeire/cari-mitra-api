@@ -1,4 +1,5 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
+import Database from '@ioc:Adonis/Lucid/Database';
 import LikedPartner from 'App/Models/LikedPartner';
 import Partner from 'App/Models/Partner';
 
@@ -57,7 +58,17 @@ export default class LikedPartnersController {
             if(user === undefined)
                 return response.unauthorized('operation not permitted')
 
-                const allLikedPartners = await LikedPartner.all();
+                const allLikedPartners = await Database
+                .from('users')
+                .join('liked_partners', 'users.id', '=', 'liked_partners.id_user')
+                .join('partners', 'partners.id', '=', 'liked_partners.id_partner')
+                .select('partners.id')
+                .select('partners.nama')
+                .select('partners.deskripsi')
+                .select('partners.alamat')
+                .select('partners.no_telp')
+                .select('partners.image_url')
+                .select('liked_partners.created_at')
 
                     return response.status(200).json({ status: 'success', code: 200, data: allLikedPartners, message: 'success getting favorites' })
         } catch (error) {
