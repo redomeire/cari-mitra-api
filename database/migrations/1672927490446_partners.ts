@@ -9,7 +9,7 @@ export default class extends BaseSchema {
       table.string('email', 255).unique().notNullable()
       table.string('password', 180).notNullable()
       table.string('nama').notNullable().defaultTo('nama partner')
-      table.string('sop').nullable()
+      table.text('sop').nullable()
       table.json('dukungan').nullable()
       table.string('no_telp').nullable()
       table.text('deskripsi').nullable()

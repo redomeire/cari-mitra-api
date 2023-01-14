@@ -24,4 +24,6 @@ export default Env.rules({
 	CLOUDINARY_CLOUD_NAME: Env.schema.string(),
 	CLOUDINARY_API_KEY: Env.schema.string(),
 	CLOUDINARY_API_SECRET: Env.schema.string(),
+	GOOGLE_CLIENT_ID: Env.schema.string(),
+  GOOGLE_CLIENT_SECRET: Env.schema.string(),
 })

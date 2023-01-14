@@ -30,8 +30,14 @@ Route.group(() => {
         Route.post('/register', 'AuthController.register');
         Route.post('/login', 'AuthController.login');
         Route.put('/password-reset', 'AuthController.reset').middleware('auth');
+        Route.put('/update', 'AuthController.update').middleware('auth');
+        Route.get('/user', 'AuthController.getUser').middleware('auth')
         Route.delete('/delete', 'AuthController.delete').middleware('auth');
         Route.post('/logout', 'AuthController.logout').middleware('auth');
+
+        // google
+        Route.get('/google/redirect', 'GooglesController.redirect');
+        Route.get('/google/callback', 'GooglesController.callback');
     }).prefix('/auth')
 
     Route.group(() => {

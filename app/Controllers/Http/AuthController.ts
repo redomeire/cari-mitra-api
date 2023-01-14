@@ -54,6 +54,19 @@ export default class AuthController {
         }
     }
 
+    public async getUser({ auth, response }: HttpContextContract){
+        try {
+            const user = auth.use('user').user;
+
+            if(user === undefined)
+                return response.unauthorized({ status: 'error', code: 401, message: 'unauthorized operation' })
+
+                return response.ok({ status: 'success', code: 200, data: user })
+        } catch (error) {
+            return response.internalServerError({ status: 'error', code: 500, message: error.message })
+        }
+    }
+
     public async reset({ auth, request, response }: HttpContextContract) {
         const body = request.only(['old_password', 'new_password']);
 
@@ -83,16 +96,20 @@ export default class AuthController {
             const user = auth.use('user').user;
 
             if(user === undefined)
-                return response.unauthorized({ message: 'operation not permitted' })
+                return response.unauthorized({ status: 'error', code: 401, message: 'operation not permitted' })
 
                 const foundUser = await User.findBy('id', user.id);
 
                 if(foundUser === null)
-                    return response.notFound({ message: 'user not found' })
+                    return response.notFound({ status: 'error', code: 404, message: 'user not found' })
 
                     foundUser.nama_depan = body.nama_depan;
                     foundUser.nama_belakang = body.nama_belakang;
-                    foundUser.email = body.email;
+                    // foundUser.email = body.email;
+                    foundUser.tanggal_lahir = body.tanggal_lahir;
+                    foundUser.address = body.address;
+                    foundUser.no_telp = body.no_telp;
+                    foundUser.username_ig = body.username_ig;
 
                     await foundUser.save();
 
