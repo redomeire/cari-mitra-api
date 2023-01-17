@@ -73,7 +73,9 @@ Route.group(() => {
         Route.get('/user/get/all', 'PengajuansController.getAllPengajuan').middleware('auth') // for user
         Route.get('/partner/find/:id', 'PengajuansController.partnerFind').middleware('auth') // for user
 
-        Route.get('/get/messages', 'ChatsController.getAllMessages').middleware('auth');
+        Route.post('/create/chatroom', 'ChatsController.createRoom').middleware('auth'); // for user
+        Route.get('/get/messages/:id_chat', 'ChatsController.getAllMessages').middleware('auth'); // for user
+        Route.post('/store/messages', 'ChatsController.storeMessage').middleware('auth'); // for user
     }).prefix('/pengajuan')
 
 }).prefix('/api')

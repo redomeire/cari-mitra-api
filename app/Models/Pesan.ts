@@ -10,6 +10,9 @@ export default class Pesan extends BaseModel {
   public id_chat: number
 
   @column()
+  public sent_by_partner: boolean
+
+  @column()
   public text_message: string
 
   @column.dateTime({ autoCreate: true })
