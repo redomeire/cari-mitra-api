@@ -75,10 +75,14 @@ export default class ChatsController {
             const foundPengajuan = await Database
             .from('pengajuans')
             .join('partners', 'partners.id', '=', 'pengajuans.id_partner')
+            .join('users', 'users.id', '=', 'pengajuans.id_user')
+            .join('chats', 'chats.id_pengajuan', '=', 'pengajuans.id')
+            .select('chats.id as id_chat')
             .select('pengajuans.*')
             .select('partners.image_url')
-            .select('partners.id')
-            .select('partners.nama')
+            .select('partners.id as id_partner')
+            .select('partners.image_url', 'partners.id', 'partners.nama')
+            .select('users.nama_depan', 'users.nama_belakang')
             .where('pengajuans.id', body.id)
             .limit(1);
 
