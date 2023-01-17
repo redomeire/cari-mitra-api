@@ -62,6 +62,7 @@ export default class LikedPartnersController {
                 .from('users')
                 .join('liked_partners', 'users.id', '=', 'liked_partners.id_user')
                 .join('partners', 'partners.id', '=', 'liked_partners.id_partner')
+                .where('liked_partners.id_user', user.id)
                 .select('partners.id')
                 .select('partners.nama')
                 .select('partners.deskripsi')

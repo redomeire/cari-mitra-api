@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.date('tanggal').nullable()
       table.dateTime('waktu').nullable()
       table.enu('status', ['berlangsung', 'berhasil', 'selesai', 'gagal']).notNullable().defaultTo('berlangsung')
-      table.string('deskripsi_acara').nullable()
+      table.text('deskripsi_acara').nullable()
       table.string('instansi').nullable()
       table.string('tempat').nullable()
 

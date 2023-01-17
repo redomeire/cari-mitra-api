@@ -30,8 +30,14 @@ Route.group(() => {
         Route.post('/register', 'AuthController.register');
         Route.post('/login', 'AuthController.login');
         Route.put('/password-reset', 'AuthController.reset').middleware('auth');
+        Route.put('/update', 'AuthController.update').middleware('auth');
+        Route.get('/user', 'AuthController.getUser').middleware('auth')
         Route.delete('/delete', 'AuthController.delete').middleware('auth');
         Route.post('/logout', 'AuthController.logout').middleware('auth');
+
+        // google
+        Route.get('/google/redirect', 'GooglesController.redirect');
+        Route.get('/google/callback', 'GooglesController.callback');
     }).prefix('/auth')
 
     Route.group(() => {
@@ -66,6 +72,10 @@ Route.group(() => {
         Route.get('/user/find/:id', 'PengajuansController.userFind').middleware('auth') // for user
         Route.get('/user/get/all', 'PengajuansController.getAllPengajuan').middleware('auth') // for user
         Route.get('/partner/find/:id', 'PengajuansController.partnerFind').middleware('auth') // for user
+
+        Route.post('/create/chatroom', 'ChatsController.createRoom').middleware('auth'); // for user
+        Route.get('/get/details/:id', 'ChatsController.detail').middleware('auth'); // for user
+        Route.post('/store/messages', 'ChatsController.storeMessage').middleware('auth'); // for user
     }).prefix('/pengajuan')
 
 }).prefix('/api')
