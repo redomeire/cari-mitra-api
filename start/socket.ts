@@ -11,9 +11,8 @@ Ws.io.on('connection', (socket) => {
     });
 
     // typing user
-    socket.on(`user:typing`, (data: { isTyping: boolean, id: number, isPartner: boolean }) => {
-
-        socket.join('typing:' + data.id)
+    socket.on(`user:typing`, (data: { isTyping: boolean, id: number, isPartner: boolean }) => {        
+        Ws.io.socketsJoin('typing:' + data.id)
 
         socket.to(`typing:${data.id}`).emit(`user:typing:${data.id}`, { isTyping: data.isTyping, isPartner: data.isPartner })
     })

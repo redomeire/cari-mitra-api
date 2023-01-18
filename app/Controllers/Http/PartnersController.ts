@@ -7,14 +7,28 @@ export default class PartnersController {
 
     public async index({ auth, response }: HttpContextContract) {
         try {
-            if (await auth.use('partner').check()) {
-                return response.status(200).json({ data: await Partner.all() })
-            }
+            const user = auth.use('partner').user;
 
-            else
-                return response.status(401).json({ message: 'unauthorized operation' })
+            if(user === undefined)
+                return response.unauthorized({ status: 'error', code: 401, message: 'unauthorized operation' })
+
+            const results = await Database
+            .from('partners')
+            .join('pengajuans', 'pengajuans.id_partner', "=", "partners.id")
+            .count('*', 'total_pengajuan')
+            .where('partners.id', user.id)
+
+            const pengajuanBerhasil = await Database
+            .from('pengajuans')
+            .join('partners', 'partners.id', '=', 'pengajuans.id')
+            .count('*', 'total_pengajuan_berhasil')
+            .where('partners.id', user.id)
+            .where('pengajuans.status', 'berhasil')
+
+            return response.ok({ status: 'success', total: results[0].total_pengajuan, total_pengajuan_berhasil: pengajuanBerhasil[0].total_pengajuan_berhasil })
+            
         } catch (err) {
-            return response.status(401).json({ status: 'error', code: 401, message: err.message })
+            return response.status(500).json({ status: 'error', code: 500, message: err.message })
         }
 
     }

@@ -43,7 +43,7 @@ Route.group(() => {
     Route.group(() => {
         Route.post('/create', 'PartnersController.create');
         Route.post('/login', 'PartnersController.login');
-        Route.get('/get/all', 'PartnersController.index').middleware('auth');
+        Route.get('/get', 'PartnersController.index').middleware('auth');
         Route.get('/get/:id', 'PartnersController.getById').middleware('auth');
         Route.get('/search', 'PartnersController.find').middleware('auth');
         Route.put('/edit', 'PartnersController.edit').middleware('auth');
@@ -70,7 +70,7 @@ Route.group(() => {
         Route.post('/create', 'PengajuansController.create').middleware('auth') // for user
         Route.put('/update', 'PengajuansController.update').middleware('auth') // for partner
         Route.get('/user/find/:id', 'PengajuansController.userFind').middleware('auth') // for user
-        Route.get('/user/get/all', 'PengajuansController.getAllPengajuan').middleware('auth') // for user
+        Route.get('/user/get/all', 'PengajuansController.getAllPengajuan').middleware('auth')
         Route.get('/partner/find/:id', 'PengajuansController.partnerFind').middleware('auth') // for user
 
         Route.post('/create/chatroom', 'ChatsController.createRoom').middleware('auth'); // for user
