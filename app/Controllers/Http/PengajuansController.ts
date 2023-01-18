@@ -90,24 +90,44 @@ export default class PengajuansController {
         }
     }
 
-    public async getAllPengajuan({ auth, response }: HttpContextContract){
-        try {
-            const user = auth.use('user').user;
+    public async getAllPengajuan({ auth, request ,response }: HttpContextContract){
+        const body = request.qs();
 
+        try {
+            const user = auth.use('user').user || auth.use('partner').user;
+            
             if(user === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'operation not permitted' })
 
-                const foundPengajuans = await Database
-                .from('pengajuans')
-                .join('partners', 'partners.id', '=', 'pengajuans.id_partner')
-                .join('users', 'users.id', '=', 'pengajuans.id_user')
-                .where('pengajuans.id_user', user.id)
-                .select('pengajuans.id')
-                .select('partners.nama')
-                .select('partners.image_url')
-                .select('pengajuans.created_at')
-                .select('pengajuans.status')
-                .select('pengajuans.nama_acara')
+                let foundPengajuans = {};
+
+                if(body.role === 'user') {
+                    foundPengajuans = await Database
+                    .from('pengajuans')
+                    .join('partners', 'partners.id', '=', 'pengajuans.id_partner')
+                    .join('users', 'users.id', '=', 'pengajuans.id_user')
+                    .where('pengajuans.id_user', user.id)
+                    .select('pengajuans.id')
+                    .select('partners.nama')
+                    .select('partners.image_url')
+                    .select('pengajuans.created_at')
+                    .select('pengajuans.status')
+                    .select('pengajuans.nama_acara')
+                } else if(body.role === 'partner') {
+                    foundPengajuans = await Database
+                    .from('pengajuans')
+                    .join('partners', 'partners.id', '=', 'pengajuans.id_partner')
+                    .join('users', 'users.id', '=', 'pengajuans.id_user')
+                    .where('pengajuans.id_partner', user.id)
+                    .select('pengajuans.id as id_pengajuan')
+                    .select('partners.nama')
+                    .select('partners.image_url')
+                    .select('pengajuans.created_at')
+                    .select('users.nama_depan')
+                    .select('users.nama_belakang')
+                    .select('pengajuans.status')
+                    .select('pengajuans.nama_acara')
+                }
 
                 return response.ok({ status: 'ok', code: 200, data: foundPengajuans })
         } catch (error) {
