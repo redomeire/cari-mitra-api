@@ -76,6 +76,7 @@ Route.group(() => {
         Route.post('/create/chatroom', 'ChatsController.createRoom').middleware('auth'); // for user
         Route.get('/get/details/:id', 'ChatsController.detail').middleware('auth'); // for user
         Route.post('/store/messages', 'ChatsController.storeMessage').middleware('auth'); // for user
+        Route.delete('/message/delete', 'ChatsController.deleteMessage').middleware('auth');
     }).prefix('/pengajuan')
 
 }).prefix('/api')

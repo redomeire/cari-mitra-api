@@ -20,7 +20,7 @@ export default class PartnersController {
 
             const pengajuanBerhasil = await Database
             .from('pengajuans')
-            .join('partners', 'partners.id', '=', 'pengajuans.id')
+            .join('partners', 'partners.id', '=', 'pengajuans.id_partner')
             .count('*', 'total_pengajuan_berhasil')
             .where('partners.id', user.id)
             .where('pengajuans.status', 'berhasil')
