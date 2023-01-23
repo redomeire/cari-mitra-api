@@ -1,5 +1,6 @@
 import type { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Database from '@ioc:Adonis/Lucid/Database';
+import Chat from 'App/Models/Chat';
 import Pengajuan from 'App/Models/Pengajuan';
 
 export default class PengajuansController {
@@ -25,6 +26,12 @@ export default class PengajuansController {
                 newPengajuan.tempat = body.tempat
 
                 await newPengajuan.save()
+
+                const newChatRoom = new Chat();
+
+                newChatRoom.id_pengajuan = newPengajuan.id;
+
+                await newChatRoom.save();
 
                 return response.status(200).json({ status: 'success', code: 200, data: newPengajuan, message: 'pengajuan baru berhasil dibuat' })
 
