@@ -19,11 +19,21 @@ export default Env.rules({
 	PORT: Env.schema.number(),
 	APP_KEY: Env.schema.string(),
 	APP_NAME: Env.schema.string(),
-  DRIVE_DISK: Env.schema.enum(['local'] as const),
+	DRIVE_DISK: Env.schema.enum(['local'] as const),
 	NODE_ENV: Env.schema.enum(['development', 'production', 'test'] as const),
+
+	// cloudinary image upload cdn
 	CLOUDINARY_CLOUD_NAME: Env.schema.string(),
 	CLOUDINARY_API_KEY: Env.schema.string(),
 	CLOUDINARY_API_SECRET: Env.schema.string(),
+
+	// google auth
 	GOOGLE_CLIENT_ID: Env.schema.string(),
-  GOOGLE_CLIENT_SECRET: Env.schema.string(),
+	GOOGLE_CLIENT_SECRET: Env.schema.string(),
+
+	// smtp
+	SMTP_HOST: Env.schema.string({ format: 'host' }),
+	SMTP_PORT: Env.schema.number(),
+	SMTP_USERNAME: Env.schema.string(),
+	SMTP_PASSWORD: Env.schema.string(),
 })

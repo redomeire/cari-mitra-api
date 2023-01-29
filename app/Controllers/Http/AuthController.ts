@@ -1,19 +1,20 @@
 import User from "App/Models/User";
 import { HttpContextContract } from '@ioc:Adonis/Core/HttpContext'
 import Hash from "@ioc:Adonis/Core/Hash";
+import Mail from "@ioc:Adonis/Addons/Mail";
 
 
 export default class AuthController {
     public async login({ auth, request, response }: HttpContextContract) {
         const body = request.only(['email', 'password']);
 
-        try {                
+        try {
             const foundUser = await User.query().where('email', body.email).first();
 
-            if (foundUser === null) 
+            if (foundUser === null)
                 return response.notFound({ status: 'error', code: 404, message: 'user not found' })
 
-            if (!(await Hash.verify(foundUser.password, body.password))) 
+            if (!(await Hash.verify(foundUser.password, body.password)))
                 return response.forbidden({ status: 'error', code: 403, message: 'email or password wrong' });
 
             const token = await auth.use('user').generate(foundUser); // add expiration in next update
@@ -47,6 +48,18 @@ export default class AuthController {
 
             await user.save();
 
+            await Mail.use('smtp').send((message) => {
+                message
+                    .from('info@carimitra.com')
+                    .to(user.email)
+                    .subject('Welcome Onboard!')
+                    .htmlView('emails/welcome', {
+                        nama_depan: user.nama_depan,
+                        nama_belakang: user.nama_belakang,
+                        url: 'http://localhost:3000/'
+                    })
+            })
+
             return response.status(200).json({ status: 'success', code: 200, data: { ...user.toJSON(), message: 'success create user' } })
 
         } catch (err) {
@@ -54,14 +67,14 @@ export default class AuthController {
         }
     }
 
-    public async getUser({ auth, response }: HttpContextContract){
+    public async getUser({ auth, response }: HttpContextContract) {
         try {
             const user = auth.use('user').user;
 
-            if(user === undefined)
+            if (user === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'unauthorized operation' })
 
-                return response.ok({ status: 'success', code: 200, data: user })
+            return response.ok({ status: 'success', code: 200, data: user })
         } catch (error) {
             return response.internalServerError({ status: 'error', code: 500, message: error.message })
         }
@@ -89,32 +102,32 @@ export default class AuthController {
         }
     }
 
-    public async update({ auth, request, response }: HttpContextContract){
+    public async update({ auth, request, response }: HttpContextContract) {
         const body = request.all();
 
         try {
             const user = auth.use('user').user;
 
-            if(user === undefined)
+            if (user === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'operation not permitted' })
 
-                const foundUser = await User.findBy('id', user.id);
+            const foundUser = await User.findBy('id', user.id);
 
-                if(foundUser === null)
-                    return response.notFound({ status: 'error', code: 404, message: 'user not found' })
+            if (foundUser === null)
+                return response.notFound({ status: 'error', code: 404, message: 'user not found' })
 
-                    foundUser.nama_depan = body.nama_depan;
-                    foundUser.nama_belakang = body.nama_belakang;
-                    // foundUser.email = body.email;
-                    foundUser.tanggal_lahir = body.tanggal_lahir;
-                    foundUser.address = body.address;
-                    foundUser.no_telp = body.no_telp;
-                    foundUser.username_ig = body.username_ig;
+            foundUser.nama_depan = body.nama_depan;
+            foundUser.nama_belakang = body.nama_belakang;
+            // foundUser.email = body.email;
+            foundUser.tanggal_lahir = body.tanggal_lahir;
+            foundUser.address = body.address;
+            foundUser.no_telp = body.no_telp;
+            foundUser.username_ig = body.username_ig;
 
-                    await foundUser.save();
+            await foundUser.save();
 
-                    return response.ok({ status: 'success', code: 200, data: foundUser, message: 'success update profile' })
-                
+            return response.ok({ status: 'success', code: 200, data: foundUser, message: 'success update profile' })
+
         } catch (error) {
             return response.badRequest({ message: 'error processing request' })
         }
@@ -122,29 +135,29 @@ export default class AuthController {
 
     public async delete({ auth, request, response }: HttpContextContract) {
         const body = request.only(['id'])
-        
-        try{
-            if(!(await auth.use('user').check()))
+
+        try {
+            if (!(await auth.use('user').check()))
                 return response.unauthorized('operation not permitted')
 
             const foundUser = await User.findBy('id', body.id);
 
-            if(foundUser !== null) {
+            if (foundUser !== null) {
                 await foundUser.delete();
 
                 return response.status(200).json({ code: 200, status: 'success', data: foundUser })
             } else throw new Error('user not found');
 
-        } catch(err) {
+        } catch (err) {
             return response.status(404).json({ status: 'error', code: 404, data: { message: err.message } })
         }
     }
 
-    public async logout({ auth, response }: HttpContextContract){
+    public async logout({ auth, response }: HttpContextContract) {
         try {
             const user = auth.use('user').user;
 
-            if(user === undefined)
+            if (user === undefined)
                 return response.unauthorized({ status: 'error', code: 401, message: 'request unauthorized' })
 
             await auth.use('user').revoke()
